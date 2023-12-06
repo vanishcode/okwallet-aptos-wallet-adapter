@@ -92,9 +92,13 @@ export class OKXWallet implements AdapterPlugin {
       if (!response) {
         throw new Error("No response") as AptosWalletErrorResult;
       }
-      return { hash: response } as { hash: Types.HexEncodedBytes };
+      return (response as any) as { hash: Types.HexEncodedBytes };
     } catch (error: any) {
-      throw error;
+      // TODO: Message is improperly set from upstream, please convert it properly into a string.  Right now it shows the below:
+      // `{"code":-32603,"message":"[object Object]","data":{"originalError":{}}}`
+      // The `[object Object]` should be a string representation of the error, which should have an error message from the VM or elsewhere.
+      // The JSON .stringify is a temporary fix to get some message to show up.
+      throw new Error(`${JSON.stringify(error)}`)
     }
   }
 
@@ -108,7 +112,7 @@ export class OKXWallet implements AdapterPlugin {
         options
       );
       if (!response) {
-        throw new Error("No response") as AptosWalletErrorResult;
+        throw new Error("Failed to sign transaction") as AptosWalletErrorResult;
       }
       return response;
     } catch (error: any) {
