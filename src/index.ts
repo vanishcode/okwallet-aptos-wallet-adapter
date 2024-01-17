@@ -1,6 +1,5 @@
 import {
   AptosWalletErrorResult,
-  NetworkName,
   PluginProvider,
   WalletReadyState,
 } from "@aptos-labs/wallet-adapter-core";
@@ -12,7 +11,8 @@ import type {
   SignMessageResponse,
   WalletName,
 } from "@aptos-labs/wallet-adapter-core";
-import { Types } from "aptos";
+import { Types, Network } from "aptos";
+
 interface OKXProvider extends Omit<PluginProvider, "signAndSubmitTransaction"> {
   signTransaction(
     transaction: any,
@@ -37,9 +37,6 @@ declare const window: OKXWindow;
 export const OKXWalletName = "OKX Wallet" as WalletName<"OKX Wallet">;
 
 export class OKXWallet implements AdapterPlugin {
-  private networkToChainId = {
-    mainnet: 1,
-  };
   readonly name = OKXWalletName;
   readonly url = "https://okx.com/web3/";
   readonly icon =
@@ -102,13 +99,13 @@ export class OKXWallet implements AdapterPlugin {
       if (!response) {
         throw new Error("No response") as AptosWalletErrorResult;
       }
-      return (response as any) as { hash: Types.HexEncodedBytes };
+      return response as any as { hash: Types.HexEncodedBytes };
     } catch (error: any) {
       // TODO: Message is improperly set from upstream, please convert it properly into a string.  Right now it shows the below:
       // `{"code":-32603,"message":"[object Object]","data":{"originalError":{}}}`
       // The `[object Object]` should be a string representation of the error, which should have an error message from the VM or elsewhere.
       // The JSON .stringify is a temporary fix to get some message to show up.
-      throw new Error(`${JSON.stringify(error)}`)
+      throw new Error(`${JSON.stringify(error)}`);
     }
   }
 
@@ -191,15 +188,9 @@ export class OKXWallet implements AdapterPlugin {
   }
 
   async network(): Promise<NetworkInfo> {
-    try {
-      const response = await this.provider?.aptos?.network();
-      if (!response) throw `${OKXWalletName} Network Error`;
-      return {
-        name: response.toLowerCase() as NetworkName.Mainnet,
-        chainId: this.networkToChainId[response.toLowerCase()],
-      };
-    } catch (error: any) {
-      throw error;
-    }
+    return {
+      name: Network.MAINNET,
+      chainId: "1",
+    };
   }
 }
