@@ -48,6 +48,16 @@ export class OKXWallet implements AdapterPlugin {
   provider: OKXWalletInterface | undefined =
     typeof window !== "undefined" ? window?.okxwallet : undefined;
 
+  deeplinkProvider(data: { url: string }): string {
+    // Taken from https://www.okx.com/web3/build/docs/sdks/app-universal-link
+    const dappUrl = data.url;
+    const encodedDappUrl = encodeURIComponent(dappUrl);
+    // TODO: The download deeplink doesn't work, but direct deeplink does.
+    // This will need to be fixed in the future
+    const deepLink = "okx://wallet/dapp/url?dappUrl=" + encodedDappUrl;
+    return deepLink;
+  }
+
   readyState: WalletReadyState =
     typeof window !== "undefined"
       ? window?.okxwallet
@@ -139,12 +149,13 @@ export class OKXWallet implements AdapterPlugin {
 
   async onNetworkChange(callback: any): Promise<void> {
     try {
-      const handleNetworkChange = async (newNetwork: {
-        networkName: NetworkInfo;
-      }): Promise<void> => {
+      const handleNetworkChange = async (
+        networkInfo: NetworkInfo
+      ): Promise<void> => {
+        // This doesn't currently apply, since non-mainnet networks are not supported on OKX.
         callback({
-          name: newNetwork,
-          chainId: undefined,
+          name: networkInfo?.name,
+          chainId: networkInfo?.chainId,
           api: undefined,
         });
       };
