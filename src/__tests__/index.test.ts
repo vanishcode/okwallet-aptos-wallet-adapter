@@ -43,7 +43,19 @@ describe("OKXWallet", () => {
     expect(typeof wallet.onAccountChange).toBe("function");
   });
 
-  test("defines network()", () => {
+  test("defines network()", async () => {
+    expect(await wallet.network()).toEqual({
+      name: "mainnet",
+      chainId: "1",
+    });
     expect(typeof wallet.network).toBe("function");
+  });
+
+  test("defines deeplinkProvider", () => {
+    console.log(wallet.deeplinkProvider({ url: "test" }));
+    const result =
+      "https://www.okx.com/download?deeplink=okx%3A%2F%2Fwallet%2Fdapp%2Furl%3FdappUrl%3Dtest";
+    expect(typeof wallet.deeplinkProvider({ url: "test" })).toBe("string");
+    expect(wallet.deeplinkProvider({ url: "test" })).toBe(result);
   });
 });
