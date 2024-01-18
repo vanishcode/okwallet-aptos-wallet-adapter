@@ -45,13 +45,14 @@ export class OKXWallet implements AdapterPlugin {
   provider: OKXWalletInterface | undefined =
     typeof window !== "undefined" ? window?.okxwallet : undefined;
 
-  deeplinkProvider(data: { url: string }): string {
-    // Taken from https://www.okx.com/web3/build/docs/sdks/app-universal-link
-    const dappUrl = data.url;
-    const encodedDappUrl = encodeURIComponent(dappUrl);
-    // TODO: The download deeplink doesn't work, but direct deeplink does.
-    // This will need to be fixed in the future
-    const deepLink = "okx://wallet/dapp/url?dappUrl=" + encodedDappUrl;
+  deeplinkProvider(data?: { url?: string }): string {
+    const target = data?.url || window?.location?.href;
+
+    const downloadLink = "https://www.okx.com/download?deeplink=";
+    const appLink = "okx://wallet/dapp/url?dappUrl=";
+
+    const deepLink =
+      downloadLink + encodeURIComponent(appLink + encodeURIComponent(target));
     return deepLink;
   }
 
