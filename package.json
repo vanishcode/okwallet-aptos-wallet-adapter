@@ -1,6 +1,6 @@
 {
     "name": "@okwallet/aptos-wallet-adapter",
-    "version": "0.0.5",
+    "version": "0.0.6",
     "description": "Official OKX Wallet Adapter for Aptos",
     "author": {
       "name": "okfe",
